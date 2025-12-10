@@ -1,0 +1,33 @@
+h1.subject{
+color:green;
+text-align:center;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 48px 0 0;
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.sidebar-sticky {
+  position: relative;
+  top: 0;
+  height: calc(100vh - 48px);
+  padding-top: .5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.sidebar .nav-item{
+    background-color: #28a745;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+.sidebar .nav-link {
+    width: 100%;
+    color: #ffffff;
+    font-weight: bold;
+}

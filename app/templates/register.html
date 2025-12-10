@@ -1,0 +1,38 @@
+{% extends 'layout/base.html'%}
+{%block title%}Đăng Ký Người Dùng{%endblock%}
+{%block content%}
+        <h1 class="text-danger subject">Đăng Ký Người Dùng</h1>
+        <form method='post' action="{{url_for('register')}}" enctype="multipart/form-data">
+            {%if err_msg%}
+            <div class="alert alert-danger">
+                <h4><b>{{err_msg}}</b></h4>
+            </div>
+            {%endif%}
+              <div class="form-group">
+                <label for="name">Full name:</label>
+                <input type="text" class="form-control" placeholder="Enter fullname" name='name'id="name" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email address:</label>
+                <input type="email" class="form-control" placeholder="Enter email" name="email" id="email" >
+              </div>
+              <div class="form-group">
+                  <label for="username">Username</label>
+                  <input type="text" class="form-control" placeholder="Enter username" name="username" id="username" required>
+
+              </div>
+              <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" placeholder="Enter password" name='password' id="password" required>
+              </div>
+              <div class="form-group">
+                <label for="comfirm">Commit Password:</label>
+                <input type="password" class="form-control" placeholder="Enter password" name="comfirm" id="comfirm" required>
+              </div>
+              <div class="form-group">
+                <label for="avatar">Avatar</label>
+                <input type="file" class="form-control" placeholder="Chose file" name="avatar" id="avatar" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+{%endblock%}
