@@ -1,0 +1,44 @@
+{% extends 'layout/base.html'%}<!-- extends cần thay đổi j thì ghi đè lên như sau -->
+{%block title%}Trang chủ{%endblock%}
+{%block content%}
+<h1 class="subject"> Quản Lý Trẻ </h1>
+<div>
+
+    <div class="dropdown">
+      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+          Chọn Lớp
+      </button>
+      <div class="dropdown-menu">
+            {%if classes%}
+            {%for c in classes%}
+                <a class="dropdown-item" href="{{url_for('loadchild',class_id=c.id)}}">{{c.name}}</a>
+            {%endfor%}
+            {%endif%}
+      </div>
+      <a href="{{ url_for('addchild') }}" class="button-style">
+    Thêm Trẻ Mới
+      </a>
+    </div>
+    <table class="table">
+        <tr>
+            <th>Họ Và Tên</th>
+            <th>Giới Tính</th>
+            <th>Phụ Huynh</th>
+            <th>SĐT Phụ Huynh</th>
+            <th>Địa Chỉ</th>
+            <th>Xóa</th>
+            <th>Sửa</th>
+        </tr>
+        {%for c in class_by_id%}
+        <tr>
+            <td>{{c.fullname}}</td>
+            <td>{{c.gender}}</td>
+            <td>{{c.guardian_name}}</td>
+            <td>{{c.guardian_phone}}</td>
+            <td>{{c.address}}</td>
+        </tr>
+        {%endfor%}
+
+    </table>
+</div>
+{%endblock%}

@@ -1,3 +1,5 @@
+from itertools import count
+
 from app import app,utils,login
 from app.models import *
 import cloudinary.uploader
@@ -57,5 +59,34 @@ def logout():
 @login.user_loader# tự gọi khi đăng nhập thành công
 def user_load(user_id):
     return utils.get_user_by_id(user_id=user_id)
+@app.route('/child',methods=['GET','POST'])
+def child():
+    classes=utils.LoadClasses()
+    return render_template('managechild.html')
+@app.route('/addchild',methods=['GET','POST'])
+def addchild():
+    if request.method == 'POST':
+        fullname = request.form['fullname']
+        gender = request.form.get('gender')
+        classes_id = request.form['classes']
+        guardian_name = request.form['guardian_name']
+        guardian_phone = request.form['guardian_phone']
+        address = request.form['address']
+        utils.add_child(fullname, gender, classes_id, guardian_name, guardian_phone, address=address)
+        return redirect('/')
+    return render_template('addchild.html', classes=Classes.query.all())
+@app.route('/loadchild/<int:class_id>',methods=['GET','POST'])
+def loadchild(class_id):
+    class_by_id = utils.LoadClass_by_id(class_id=class_id)
+    return render_template('managechild.html', class_by_id=class_by_id)
+@app.route('/stats',methods=['GET','POST'])
+def stats():
+    count=utils.Get_Count_Gender()
+    return render_template('stats.html',count=count)
+@app.context_processor  # dùng để toàn bộ hàm khác đề có classes
+def common_response():
+    return {
+        'classes':utils.LoadClasses(),
+    }
 if __name__ == '__main__':
     app.run(debug=True)

@@ -12,9 +12,6 @@ class BaseModel(db.Model):
 class UserRole(UserEnum):
     ADMIN=1
     USER=2
-class Gender(UserEnum):
-    MALE=1
-    FEMALE=2
 class User(BaseModel,UserMixin):
     __tablename__ = 'user'
     name=Column(String(50),nullable=False)
@@ -31,7 +28,7 @@ class User(BaseModel,UserMixin):
 class Child(BaseModel):
     __tablename__ = 'child'
     fullname=Column(String(50),nullable=False)
-    gender=Column(Enum(Gender),default=Gender.MALE)
+    gender=Column(String(3),nullable=False,default="Nam")
     guardian_name=Column(String(50),nullable=False)
     guardian_phone=Column(String(50),nullable=False)
     address=Column(String(50),nullable=False)

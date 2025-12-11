@@ -31,3 +31,17 @@ text-align:center;
     color: #ffffff;
     font-weight: bold;
 }
+.button-style {
+    display: inline-block;
+    padding: 7px 10px;
+    background-color:green;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.container{
+    width: 80%;
+    margin: 0 auto;
+}
