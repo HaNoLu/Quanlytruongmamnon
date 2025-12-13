@@ -18,7 +18,6 @@ class User(BaseModel,UserMixin):
     username=Column(String(50),nullable=False)
     email=Column(String(50),nullable=False)
     password=Column(String(50),nullable=False)
-    avatar=Column(String(100),nullable=True)
     active=Column(Boolean,default=True )
     joined_date=Column(DateTime,default=datetime.now)
     user_role=Column(Enum(UserRole),default=UserRole.USER)

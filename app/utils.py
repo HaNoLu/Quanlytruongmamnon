@@ -9,7 +9,6 @@ def add_User(username ,password ,name ,**kwagrs):
               password=password,
               name=name,
               email=kwagrs.get('email'),
-              avatar=kwagrs.get('avatar'),
               )
     db.session.add(user)
     db.session.commit()

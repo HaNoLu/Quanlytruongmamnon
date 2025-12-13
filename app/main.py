@@ -18,19 +18,16 @@ def register():
         password=request.form.get('password')
         email=request.form.get('email')
         comfirm=request.form.get('comfirm')
-        avatar=request.files.get('avatar')
-        avatar_path=None
+
         try:
 
             if(password.strip().__eq__(comfirm.strip())):
-                if avatar:
-                    res = cloudinary.uploader.upload(avatar)
-                    avatar_path=res['secure_url']
+
                 utils.add_User(name=name.strip(),
                                username=username.strip(),
                                password=str(password.strip()),
-                               email=email,
-                               avatar=avatar_path,)
+                               email=email,)
+
                 return redirect(url_for('login_page'))
             else:
                 err_msg="Mật khẩu không trùng khớp"
