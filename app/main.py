@@ -1,8 +1,6 @@
-from itertools import count
 
-from app import app,utils,login
+from app import app,utils,login,admin
 from app.models import *
-import cloudinary.uploader
 from flask import render_template,request,redirect,url_for
 from flask_login import login_user,logout_user
 @app.route('/')
@@ -56,6 +54,17 @@ def logout():
 @login.user_loader# tự gọi khi đăng nhập thành công
 def user_load(user_id):
     return utils.get_user_by_id(user_id=user_id)
+@app.route('/admin_login',methods=['POST'])
+def admin_login():
+        if request.method.__eq__('POST'):
+            username = request.form.get('username')
+            password = request.form.get('password')
+            user = utils.check_admin(username=username,
+                                     password=password,
+                                     role=UserRole.ADMIN)
+        if user:
+            login_user(user=user)
+        return redirect('/admin')
 @app.route('/child',methods=['GET','POST'])
 def child():
     classes=utils.LoadClasses()

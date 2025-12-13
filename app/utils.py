@@ -36,6 +36,13 @@ def add_child(fullname,gender,classes_id,guardian_name,guardian_phone,**kwargs):
         db.session.rollback()
         print("error:",e)
         return False
+def check_admin(username,password,role):
+    user=User.query.filter(User.username==username.strip(),
+                           User.password==str(hashlib.md5(password.encode('utf-8')).hexdigest()),
+                           User.user_role.__eq__(role)).first()
+    if user:
+        return user
+
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 def LoadChild(class_id):
