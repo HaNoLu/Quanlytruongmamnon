@@ -56,3 +56,9 @@ def Get_Count_Gender():
         'total_nu':Child.query.filter(Child.gender.__eq__("Nữ")).count(),
         'total_nam':Child.query.filter(Child.gender.__eq__("Nam")).count()
     }
+def Get_Count_Classes(class_id):
+    return {
+        'total_nu':Child.query.filter(Child.classes_id==class_id,Child.gender.__eq__("Nữ")).count(),
+        'total_nam':Child.query.filter(Child.classes_id==class_id,Child.gender.__eq__("Nam")).count(),
+        'total':Child.query.filter(Child.classes_id==class_id).count()
+    }

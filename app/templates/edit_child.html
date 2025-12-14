@@ -1,0 +1,27 @@
+{% extends 'layout/base.html'%}<!-- extends cần thay đổi j thì ghi đè lên như sau -->
+{%block title%}Trang chủ{%endblock%}
+{%block content%}
+<h2>Sửa thông tin trẻ</h2>
+
+<form method="post">
+    <label>Họ tên</label>
+    <input type="text" name="fullname" value="{{ child.fullname }}" class="form-control">
+
+    <label>Giới tính</label>
+    <select name="gender" class="form-control">
+        <option value="Nam" {% if child.gender =='Nam' %}selected{% endif %}>Nam</option>
+        <option value="Nữ" {% if child.gender =='Nữ' %}selected{% endif %}>Nữ</option>
+    </select>
+
+    <label>Phụ huynh</label>
+    <input type="text" name="guardian_name" value="{{ child.guardian_name }}" class="form-control">
+
+    <label>SĐT</label>
+    <input type="text" name="guardian_phone" value="{{ child.guardian_phone }}" class="form-control">
+
+    <label>Địa chỉ</label>
+    <input type="text" name="address" value="{{ child.address }}" class="form-control">
+
+    <button class="btn btn-success mt-3">Lưu thay đổi</button>
+</form>
+{%endblock%}

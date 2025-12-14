@@ -1,21 +1,7 @@
-{% extends 'layout/base.html'%}<!-- extends cần thay đổi j thì ghi đè lên như sau -->
-{%block title%}Trang chủ{%endblock%}
-{%block content%}
+{%extends 'admin/base.html'%}
+{%block body%}
 <h1 class="subject"> Thống Kê Và Báo Cáo</h1>
 <div class="container">
-    <div class="dropdown">
-      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-          Chọn Lọc
-      </button>
-      <div class="dropdown-menu">
-           <a class="dropdown-item" href="#">Doanh Thu</a>
-           <a class="dropdown-item" href="#">Sĩ Số</a>
-           <a class="dropdown-item" href="{{url_for('stats')}}">Nam Nữ</a>
-      </div>
-
-    </div>
-
-
     <div class="row">
         <div class="col-md-6 col-xs-12">
             <table class="table">
@@ -38,14 +24,28 @@
             </table>
         </div>
         <div class="col-md-6 col-xs-12">
+            <div class="dropdown">
+              <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                  Chọn Lớp
+              </button>
+              <div class="dropdown-menu">
+                    {%if classes%}
+                    {%for c in classes%}
+                        <a class="dropdown-item" href="{{url_for('statschildbyclasses_id.index',class_id=c.id)}}">{{c.name}}</a>
+                    {%endfor%}
+                    {%endif%}
+              </div>
+            </div>
             <canvas id="myGenderChart"></canvas>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
-              let labels=['Nam','Nữ']
+              {%if count%}
+              let labels=['Nam','Nữ','Tổng']
               let data=[]
 
               data.push({{count['total_nam']}})
               data.push({{count['total_nu']}})
+              data.push({{count['total']}})
 
               window.onload=function(){
                       const ctx = document.getElementById('myGenderChart');
@@ -69,10 +69,9 @@
                         }
                       });
               }
+              {%endif%}
             </script>
         </div>
     </div>
-
-
-    {%endblock%}
 </div>
+{%endblock%}

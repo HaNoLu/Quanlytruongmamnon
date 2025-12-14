@@ -85,10 +85,26 @@ def addchild():
 def loadchild(class_id):
     class_by_id = utils.LoadClass_by_id(class_id=class_id)
     return render_template('managechild.html', class_by_id=class_by_id)
-@app.route('/stats',methods=['GET','POST'])
-def stats():
-    count=utils.Get_Count_Gender()
-    return render_template('stats.html',count=count)
+@app.route('/edit-child/<int:child_id>', methods=['GET', 'POST'])
+def edit_child(child_id):
+    child = Child.query.get(child_id)
+    if request.method == 'POST':
+        child.fullname = request.form['fullname']
+        child.gender = request.form['gender']
+        child.guardian_name = request.form['guardian_name']
+        child.guardian_phone = request.form['guardian_phone']
+        child.address = request.form['address']
+        db.session.commit()
+        return redirect(url_for('loadchild', class_id=child.classes_id))
+
+    return render_template('edit_child.html', child=child)
+@app.route('/delete-child/<int:child_id>')
+def delete_child(child_id):
+    child = Child.query.get(child_id)
+    if child:
+        db.session.delete(child)
+        db.session.commit()
+    return redirect(request.referrer or url_for('loadchild'))
 @app.context_processor  # dùng để toàn bộ hàm khác đề có classes
 def common_response():
     return {
