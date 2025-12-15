@@ -2,8 +2,8 @@
 from app import db,app
 from enum import Enum as UserEnum
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey,Boolean,Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Enum, CheckConstraint
+from sqlalchemy.orm import relationship, backref
 from flask_login import UserMixin
 
 class BaseModel(db.Model):
@@ -41,6 +41,13 @@ class Classes(BaseModel):
     max_student=Column(Integer,default=25)
     user_id=Column(Integer,ForeignKey('user.id'),nullable=False)
     childs=relationship("Child",backref="classes",lazy=True)
+
+
+class Regurations(BaseModel):
+    __tablename__ = 'regulations'
+    max_student = Column(Integer, nullable=False)
+    daily_meal = Column(Integer, nullable=False)
+    base_tuition = Column(Integer, nullable=False)
 
 if __name__=='__main__':
     with app.app_context():

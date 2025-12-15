@@ -62,3 +62,6 @@ def Get_Count_Classes(class_id):
         'total_nam':Child.query.filter(Child.classes_id==class_id,Child.gender.__eq__("Nam")).count(),
         'total':Child.query.filter(Child.classes_id==class_id).count()
     }
+
+def Update_All_Classes_Max_Student(new_max_student):
+    db.session.query(Classes).update({Classes.max_student:new_max_student})
