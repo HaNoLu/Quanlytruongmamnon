@@ -221,8 +221,8 @@ def print_receipt(child_id):
     receipt = utils.get_receipt(child_id, month, year)
     if not receipt or not child:
         return "Không tìm thấy hóa đơn hoặc dữ liệu trẻ!", 404
-    basic_fee = utils.Get_Regurations['base_tuition']
-    meal_price = utils.Get_Regurations['daily_meal']
+    basic_fee = utils.Get_Regurations()['base_tuition']
+    meal_price = utils.Get_Regurations()['daily_meal']
     meal_total = receipt.meal_days * meal_price
     
     return render_template('receipt.html', 

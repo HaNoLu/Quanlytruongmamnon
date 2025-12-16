@@ -38,7 +38,6 @@ class statsGenderView(BaseView):
     @expose('/')
     def index(self):
         return self.render('admin/statsGender.html',count=utils.Get_Count_Gender())
-
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
 class RegurationView(ModelView):
@@ -52,6 +51,14 @@ class RegurationView(ModelView):
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
+class RevenueView(BaseView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
+    @expose('/')
+    def index(self):
+        month = request.args.get('month')
+        year = request.args.get('year')
+        return self.render('admin/revenue.html',revenue=utils.get_revenue(month,year),month=month,year=year)
 
 class LogOutView(BaseView):
     @expose('/')
@@ -66,6 +73,7 @@ admin.add_view(UserView(User,db.session))
 admin.add_view(RegurationView(Regurations, db.session, name = 'Quy định'))
 admin.add_view(statsGenderView(name='Tỷ lệ nam nữ'))
 admin.add_view(statsChildbyClasses_id(name='Sĩ số theo lớp'))
+admin.add_view(RevenueView(name='Doanh thu'))
 admin.add_view(LogOutView(name='Đăng xuất'))
 
 

@@ -199,7 +199,11 @@ def save_receipt_batch(child_id, month, year, meal_days, is_paid):
         print(f"Lỗi save_receipt: {e}")
         db.session.rollback()
         return False
-
+def get_revenue(month, year):
+    revenue = db.session.query(func.sum(Receipt.total_amount)) \
+        .filter(Receipt.month == month, Receipt.year == year, Receipt.status == True) \
+        .scalar()
+    return revenue or 0
 
 def get_child_by_id(child_id):
     return Child.query.get(child_id)
