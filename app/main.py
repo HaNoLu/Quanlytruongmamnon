@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from app import app,utils,login,admin
 from app.models import *
 from flask import render_template,request,redirect,url_for
@@ -110,5 +110,135 @@ def common_response():
     return {
         'classes':utils.LoadClasses(),
     }
+
+@app.route('/health', methods=['GET', 'POST'])
+def health():
+    class_id = request.args.get('class_id')
+    children = []
+
+    health_data = {}
+
+    if class_id:
+        children = utils.LoadChild(class_id)
+        for child in children:
+            record = utils.get_health_record_today(child.id)
+            if record:
+                health_data[child.id] = record
+    
+    return render_template('health.html',
+                           children=children,
+                           classes=utils.LoadClasses(),
+                           class_id=class_id,
+                           health_data=health_data)
+
+@app.route('/add-health/<int:child_id>', methods=['POST'])
+def add_health(child_id):
+    weight = request.form.get('weight')
+    temp = request.form.get('temperature')
+    note = request.form.get('note')
+    
+    success, msg = utils.add_health_record(child_id, weight, temp, note)
+
+    return redirect(request.referrer)
+
+@app.route('/save-batch-health', methods=['POST'])
+def save_batch_health():
+    class_id = request.form.get('class_id_hidden')
+
+    try:
+        for key in request.form:
+            if key.startswith('weight_'):
+                id_parts = key.split('_')
+                if len(id_parts) == 2:
+                    child_id = id_parts[1]
+
+                    weight = request.form.get(f'weight_{child_id}')
+                    temp = request.form.get(f'temp_{child_id}')
+                    note = request.form.get(f'note_{child_id}')
+
+                    if weight and temp:
+                        utils.add_health_record(child_id, weight, temp, note)
+                        
+        return redirect(url_for('health', class_id=class_id))
+    except Exception as e:
+        return f"Lỗi: {str(e)}"
+
+@app.route('/tuition', methods=['GET', 'POST'])
+def tuition():
+    class_id = request.args.get('class_id')
+    month = request.args.get('month', datetime.now().month)
+    year = request.args.get('year', datetime.now().year)
+
+    children = []
+    receipt_data = {}
+    if class_id:
+        children = utils.LoadChild(class_id)
+        for child in children:
+            receipt = utils.get_receipt(child.id, month, year)
+            if receipt:
+                receipt_data[child.id] = receipt
+
+    return render_template('tuition.html',
+                           children=children,
+                           classes=utils.LoadClasses(),
+                           class_id=class_id,
+                           selected_month=int(month),
+                           selected_year=int(year),
+                           receipt_data=receipt_data)
+
+@app.route('/pay-tuition/<int:child_id>', methods=['POST'])
+def pay_tuition(child_id):
+    month = request.form.get('month')
+    year = request.form.get('year')
+    meal_days = request.form.get('meal_days')
+    
+    if utils.create_receipt(child_id, month, year, meal_days):
+        return redirect(request.referrer)
+    else:
+        return "Có lỗi xảy ra", 500
+    
+@app.route('/save-batch-tuition', methods=['POST'])
+def save_batch_tuition():
+    class_id = request.form.get('class_id_hidden')
+    month = request.form.get('month_hidden')
+    year = request.form.get('year_hidden')
+    
+    try:
+        for key in request.form:
+            if key.startswith('meal_days_'):
+                child_id = key.split('_')[2]
+                meal_days = request.form.get(f'meal_days_{child_id}')
+                is_paid_raw = request.form.get(f'paid_{child_id}')
+                is_paid = True if is_paid_raw else False
+                
+                utils.save_receipt_batch(child_id, month, year, meal_days, is_paid)
+                
+        return redirect(url_for('tuition', class_id=class_id, month=month, year=year))
+    except Exception as e:
+        return f"Lỗi: {str(e)}"
+    
+@app.route('/print-receipt/<int:child_id>', methods=['GET'])
+def print_receipt(child_id):
+    month = request.args.get('month')
+    year = request.args.get('year')
+
+    child = utils.get_child_by_id(child_id)
+    receipt = utils.get_receipt(child_id, month, year)
+    
+    if not receipt or not child:
+        return "Không tìm thấy hóa đơn hoặc dữ liệu trẻ!", 404
+    
+    basic_fee = 1500000
+    meal_price = 25000
+    meal_total = receipt.meal_days * meal_price
+    
+    return render_template('receipt.html', 
+                           child=child, 
+                           receipt=receipt,
+                           basic_fee=basic_fee,
+                           meal_price=meal_price,
+                           meal_total=meal_total,
+                           now=datetime.now())
+
 if __name__ == '__main__':
     app.run(debug=True)

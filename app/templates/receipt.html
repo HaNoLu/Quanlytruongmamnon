@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hóa Đơn Thu Phí</title>
+    <style>
+        body { font-family: 'Times New Roman', serif; margin: 0; padding: 20px; }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+            font-size: 16px;
+            line-height: 24px;
+            color: #555;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: #333; }
+        .header p { margin: 5px 0; }
+        
+        table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; }
+        table td { padding: 5px; vertical-align: top; }
+        table tr.heading td { background: #eee; border-bottom: 1px solid #ddd; font-weight: bold; }
+        table tr.item td { border-bottom: 1px solid #eee; }
+        table tr.total td { border-top: 2px solid #333; font-weight: bold; font-size: 18px; }
+        
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        
+        .signature { margin-top: 50px; display: flex; justify-content: space-between; }
+        .signature div { text-align: center; width: 40%; }
+        
+        @media print {
+            .no-print { display: none; }
+            .invoice-box { border: none; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <div class="header">
+            <h1>PHIẾU THU TIỀN HỌC PHÍ</h1>
+            <p>Trường Mầm Non OU</p>
+            <p>Địa chỉ: Hiệp Phước, TP.HCM</p>
+            <p>Hotline: 0123456789</p>
+        </div>
+
+        <table>
+            <tr>
+                <td>
+                    <strong>Họ tên trẻ:</strong> {{ child.fullname }}<br>
+                    <strong>Lớp:</strong> {{ child.classes.name }}<br>
+                    <strong>Phụ huynh:</strong> {{ child.guardian_name }}
+                </td>
+                <td class="text-right">
+                    <strong>Số phiếu:</strong> #{{ receipt.id }}<br>
+                    <strong>Tháng:</strong> {{ receipt.month }}/{{ receipt.year }}<br>
+                    <strong>Ngày xuất hóa đơn:</strong> {{ now.strftime('%d/%m/%Y %H:%M') }}
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table cellpadding="0" cellspacing="0">
+            <tr class="heading">
+                <td>Nội dung thu</td>
+                <td class="text-center">Đơn giá / SL</td>
+                <td class="text-right">Thành tiền (VNĐ)</td>
+            </tr>
+
+            <tr class="item">
+                <td>Học phí cơ bản tháng {{ receipt.month }}</td>
+                <td class="text-center">1 tháng</td>
+                <td class="text-right">{{ "{:,.0f}".format(basic_fee).replace(',', '.') }}</td>
+            </tr>
+
+            <tr class="item">
+                <td>Tiền ăn</td>
+                <td class="text-center">{{ receipt.meal_days }} ngày x {{ "{:,.0f}".format(meal_price).replace(',', '.') }}</td>
+                <td class="text-right">{{ "{:,.0f}".format(meal_total).replace(',', '.') }}</td>
+            </tr>
+
+            <tr class="total">
+                <td></td>
+                <td class="text-right">TỔNG CỘNG:</td>
+                <td class="text-right">{{ "{:,.0f}".format(receipt.total_amount).replace(',', '.') }} VNĐ</td>
+            </tr>
+        </table>
+        
+        <p><i>Bằng chữ: ............................................................................................................</i></p>
+
+        <div class="signature">
+            <div>
+                <strong>Người nộp tiền</strong><br>
+                (Ký, họ tên)
+            </div>
+            <div>
+                <strong>Người lập phiếu</strong><br>
+                (Ký, họ tên)<br><br><br>
+                {{ current_user.name }}
+            </div>
+        </div>
+        
+        <div class="text-center no-print" style="margin-top: 30px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: green; color: white; cursor: pointer; border: none; font-size: 16px;">
+                IN HÓA ĐƠN
+            </button>
+            <button onclick="window.close()" style="padding: 10px 20px; background: gray; color: white; cursor: pointer; border: none; font-size: 16px;">
+                ĐÓNG
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
