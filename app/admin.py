@@ -6,6 +6,7 @@ from app import app,db,utils
 from app.models import *
 from flask import redirect, url_for, request, render_template
 from flask_login import current_user,login_user,logout_user
+
 class AuthenticationModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role.__eq__(UserRole.ADMIN)
@@ -37,6 +38,15 @@ class statsGenderView(BaseView):
         return self.render('admin/statsGender.html',count=utils.Get_Count_Gender())
     def is_accessible(self):
         return current_user.is_authenticated
+
+class RegurationView(ModelView):
+    can_delete = False
+    can_edit = True
+    can_create = False
+    def on_model_change(self, form, model, is_created):
+        new_max_student = model.max_student
+        return utils.Update_All_Class_Max_Student(new_max_student)
+
 class LogOutView(BaseView):
     @expose('/')
     def index(self):
@@ -48,6 +58,7 @@ admin = Admin(app=app, name='ManageChildApp', template_mode='bootstrap4',index_v
 admin.add_view(UserView(User,db.session))
 admin.add_view(statsGenderView(name='tỷ lệ nam nữ'))
 admin.add_view(statsChildbyClasses_id(name='sĩ số theo lớp'))
+admin.add_view(RegurationView(Regurations, db.session, name='Quy định'))
 admin.add_view(LogOutView(name='Đăng xuất'))
 
 

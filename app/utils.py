@@ -1,3 +1,5 @@
+from flask import flash
+
 from app import app,db
 from app.models import *
 from flask_login import current_user
@@ -170,3 +172,11 @@ def save_receipt_batch(child_id, month, year, meal_days, is_paid):
 def get_child_by_id(child_id):
     return Child.query.get(child_id)
 
+def Update_All_Class_Max_Student(new_max_student):
+    try:
+
+        flash(f'Đã cập nhật sĩ số tối đa công', 'success')
+
+    except Exception as ex:
+        # Thông báo lỗi (Category 'error' sẽ hiện màu đỏ)
+        flash(f'Có lỗi xảy ra: {str(ex)}', 'error')
