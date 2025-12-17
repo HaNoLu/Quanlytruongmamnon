@@ -1,11 +1,11 @@
 {%extends 'admin/base.html'%}
 {%block body%}
-{%if current_user.is_authenticated%}
+{%if current_user.is_authenticated %}
 <h1>WELCOME {{current_user.name }} TO ADMINSTRATION WEBSITE!!!</h1>
 
 {%else%}
 <h1 class=" text-center text-danger">Đăng Nhập Quản Trị Viên</h1>
-<form method='post' action="{{url_for('admin_login')}}">
+<form method='POST' action="{{url_for('admin_login')}}">
             {%if err_msg%}
             <div class="alert alert-danger">
                 <h4><b>{{err_msg}}</b></h4>

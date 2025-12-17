@@ -110,8 +110,8 @@
     function calcTotal(id) {
         let daysInput = document.getElementById('days_' + id);
         let days = parseInt(daysInput.value) || 0;
-        let basicFee = 1500000;
-        let mealPrice = 25000;
+        let basicFee = base_tuition;
+        let mealPrice = mealPrice;
         let total = basicFee + (days * mealPrice);
         document.getElementById('total_' + id).innerText = total.toLocaleString('vi-VN').replace(/,/g, '.');
     }

@@ -6,7 +6,6 @@ from flask_login import login_user,logout_user
 @app.route('/')
 def main():
     return render_template('index.html')
-
 @app.route('/register',methods=['GET','POST'])
 def register():
     err_msg=""
@@ -64,7 +63,7 @@ def admin_login():
                                      role=UserRole.ADMIN)
         if user:
             login_user(user=user)
-        return redirect('/admin')
+            return redirect('/admin')
 @app.route('/child',methods=['GET','POST'])
 def child():
     classes=utils.LoadClasses()
@@ -115,9 +114,7 @@ def common_response():
 def health():
     class_id = request.args.get('class_id')
     children = []
-
     health_data = {}
-
     if class_id:
         children = utils.LoadChild(class_id)
         for child in children:
@@ -136,9 +133,7 @@ def add_health(child_id):
     weight = request.form.get('weight')
     temp = request.form.get('temperature')
     note = request.form.get('note')
-    
     success, msg = utils.add_health_record(child_id, weight, temp, note)
-
     return redirect(request.referrer)
 
 @app.route('/save-batch-health', methods=['POST'])
@@ -168,7 +163,7 @@ def tuition():
     class_id = request.args.get('class_id')
     month = request.args.get('month', datetime.now().month)
     year = request.args.get('year', datetime.now().year)
-
+    req=utils.Get_Regurations()
     children = []
     receipt_data = {}
     if class_id:
@@ -184,7 +179,9 @@ def tuition():
                            class_id=class_id,
                            selected_month=int(month),
                            selected_year=int(year),
-                           receipt_data=receipt_data)
+                           receipt_data=receipt_data,
+                           base_tuition=req['base_tuition'],
+                           mealPrice=req['daily_meal'])
 
 @app.route('/pay-tuition/<int:child_id>', methods=['POST'])
 def pay_tuition(child_id):
@@ -202,7 +199,6 @@ def save_batch_tuition():
     class_id = request.form.get('class_id_hidden')
     month = request.form.get('month_hidden')
     year = request.form.get('year_hidden')
-    
     try:
         for key in request.form:
             if key.startswith('meal_days_'):
@@ -210,7 +206,6 @@ def save_batch_tuition():
                 meal_days = request.form.get(f'meal_days_{child_id}')
                 is_paid_raw = request.form.get(f'paid_{child_id}')
                 is_paid = True if is_paid_raw else False
-                
                 utils.save_receipt_batch(child_id, month, year, meal_days, is_paid)
                 
         return redirect(url_for('tuition', class_id=class_id, month=month, year=year))
@@ -224,12 +219,10 @@ def print_receipt(child_id):
 
     child = utils.get_child_by_id(child_id)
     receipt = utils.get_receipt(child_id, month, year)
-    
     if not receipt or not child:
         return "Không tìm thấy hóa đơn hoặc dữ liệu trẻ!", 404
-    
-    basic_fee = 1500000
-    meal_price = 25000
+    basic_fee = utils.Get_Regurations()['base_tuition']
+    meal_price = utils.Get_Regurations()['daily_meal']
     meal_total = receipt.meal_days * meal_price
     
     return render_template('receipt.html', 
@@ -241,4 +234,6 @@ def print_receipt(child_id):
                            now=datetime.now())
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    with app.app_context():
+        db.create_all()
+        app.run(debug=True)

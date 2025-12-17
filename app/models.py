@@ -63,16 +63,16 @@ class Receipt(BaseModel):
     created_date = Column(DateTime, default=datetime.now)
     month = Column(Integer, nullable=False)
     year = Column(Integer, nullable=False)
-    tuition_fee = Column(Float, default=1500000)
+    tuition_fee = Column(Float, default=150000)
     meal_days = Column(Integer, default=22)
     meal_fee_per_day = Column(Float, default=25000)
     total_amount = Column(Float)
     status = Column(Boolean, default=False)
     child_id = Column(Integer, ForeignKey('child.id'), nullable=False)
     child = relationship("Child", backref="receipts", lazy=True)
-
-if __name__=='__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+class Regurations(BaseModel):
+    __tablename__ = 'regulations'
+    max_student = Column(Integer, nullable=False,default=25)
+    daily_meal = Column(Integer, nullable=False,default=25000)
+    base_tuition = Column(Integer, nullable=False,default=1500000)
 
