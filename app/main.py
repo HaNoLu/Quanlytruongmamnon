@@ -1,8 +1,12 @@
 from datetime import datetime
 from app import app,utils,login,admin
 from app.models import *
-from flask import render_template,request,redirect,url_for
+from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user,logout_user
+
+from app.utils import LoadClasses
+
+
 @app.route('/')
 def main():
     return render_template('index.html')
@@ -77,8 +81,10 @@ def addchild():
         guardian_name = request.form['guardian_name']
         guardian_phone = request.form['guardian_phone']
         address = request.form['address']
+
         utils.add_child(fullname, gender, classes_id, guardian_name, guardian_phone, address=address)
-        return redirect('/')
+
+        return redirect(url_for('loadchild', class_id = classes_id))
     return render_template('addchild.html', classes=Classes.query.all())
 @app.route('/loadchild/<int:class_id>',methods=['GET','POST'])
 def loadchild(class_id):
@@ -232,6 +238,56 @@ def print_receipt(child_id):
                            meal_price=meal_price,
                            meal_total=meal_total,
                            now=datetime.now())
+
+
+# app/main.py
+
+@app.route('/stats', methods=['GET'])
+def stats():
+    active_tab = request.args.get('tab', 'class_size')
+
+    class_id = request.args.get('class_id')
+    class_size_data = None
+    if active_tab == 'class_size':
+        if class_id:
+            stats = utils.Get_Count_Classes(class_id)
+            current_class = db.session.get(Classes, class_id)
+
+            if current_class and stats:
+                class_size_data = {
+                    'name': current_class.name,
+                    'total': stats['total'],
+                }
+
+
+    gender_chart_data = None
+    if active_tab == 'gender_chart':
+        if class_id:
+            stats = utils.Get_Count_Classes(class_id)
+            if stats:
+                gender_chart_data = {
+                    'male': stats['total_nam'],
+                    'female': stats['total_nu']
+                }
+
+
+    revenue_data = 0
+    month = request.args.get('month', datetime.now().month)
+    year = request.args.get('year', datetime.now().year)
+    if active_tab == 'revenue':
+        revenue_data = utils.get_revenue(month, year)
+
+    return render_template('stats.html',
+                           classes=LoadClasses(),
+                           class_id = class_id,
+                           active_tab=active_tab,
+
+                           class_size_data=class_size_data,
+                           gender_chart_data=gender_chart_data,
+
+                           revenue_data=revenue_data,
+                           month=month,
+                           year=year)
 
 if __name__ == '__main__':
     with app.app_context():

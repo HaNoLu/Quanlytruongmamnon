@@ -43,11 +43,6 @@ class Classes(BaseModel):
     childs=relationship("Child",backref="classes",lazy=True)
 
 
-class Regurations(BaseModel):
-    __tablename__ = 'regulations'
-    max_student=Column(Integer,default=25)
-    base_tuition = Column(Integer,default=1500000)
-    meal_fee = Column(Integer,default=25000)
 
 class HealthRecord(BaseModel):
     __tablename__ = 'health_record'

@@ -34,7 +34,7 @@ def check_login(username, password):
 def add_child(fullname, gender, classes_id, guardian_name, guardian_phone, **kwargs):
     current_count = Child.query.filter_by(classes_id=classes_id).count()
     if current_count >= Regurations.query.first().max_student :
-        return False, "Lớp đã đủ 25 trẻ"
+        return False, "Lớp đã đủ trẻ"
     try:
         child = Child(fullname=fullname,
                       classes_id=classes_id,
