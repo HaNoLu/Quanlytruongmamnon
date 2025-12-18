@@ -24,24 +24,6 @@ class UserView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
 
-class statsChildbyClasses_id(BaseView):
-    @expose('/')
-    def index(self):
-        class_id=request.args.get('class_id')
-        if class_id:
-            return self.render('admin/stats_Child_by_Class.html',count=utils.Get_Count_Classes(class_id))
-        return self.render('admin/stats_Child_by_Class.html')
-
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
-
-class statsGenderView(BaseView):
-    @expose('/')
-    def index(self):
-        return self.render('admin/statsGender.html',count=utils.Get_Count_Gender())
-    def is_accessible(self):
-
-        return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
 class RegurationView(ModelView):
     can_create = False
     can_delete = False
@@ -53,16 +35,53 @@ class RegurationView(ModelView):
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
-class RevenueView(BaseView):
+class statsView(BaseView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
     @expose('/')
     def index(self):
-        month = request.args.get('month')
-        year = request.args.get('year')
-        return self.render('admin/revenue.html',revenue=utils.get_revenue(month,year),month=month,year=year)
+        active_tab = request.args.get('tab', 'class_size')
 
+        class_id = request.args.get('class_id')
+        class_size_data = None
+        if active_tab == 'class_size':
+            if class_id:
+                stats = utils.Get_Count_Classes(class_id)
+                current_class = db.session.get(Classes, class_id)
 
+                if current_class and stats:
+                    class_size_data = {
+                        'name': current_class.name,
+                        'total': stats['total'],
+                    }
+
+        gender_chart_data = None
+        if active_tab == 'gender_chart':
+            if class_id:
+                stats = utils.Get_Count_Classes(class_id)
+                if stats:
+                    gender_chart_data = {
+                        'male': stats['total_nam'],
+                        'female': stats['total_nu']
+                    }
+
+        revenue_data = 0
+        month = request.args.get('month', datetime.now().month)
+        year = request.args.get('year', datetime.now().year)
+        if active_tab == 'revenue':
+            revenue_data = utils.get_revenue(month, year)
+        return self.render('admin/stats.html',
+                      classes=utils.LoadClasses(),
+                      class_id=class_id,
+                      active_tab=active_tab,
+
+                      class_size_data=class_size_data,
+                      gender_chart_data=gender_chart_data,
+
+                      revenue_data=revenue_data,
+                      month=month,
+                      year=year
+                      )
 class LogOutView(BaseView):
     @expose('/')
     def index(self):
@@ -75,10 +94,7 @@ admin = Admin(app=app, name='ManageChildApp', template_mode='bootstrap4',index_v
 admin.add_view(UserView(User,db.session))
 
 admin.add_view(RegurationView(Regurations, db.session, name = 'Quy định'))
-admin.add_view(statsGenderView(name='Tỷ lệ nam nữ'))
-admin.add_view(statsChildbyClasses_id(name='Sĩ số theo lớp'))
-admin.add_view(RevenueView(name='Doanh thu'))
-
+admin.add_view(statsView(name='Thống Kê và Báo Cáo',endpoint='statsview'))
 admin.add_view(LogOutView(name='Đăng xuất'))
 
 

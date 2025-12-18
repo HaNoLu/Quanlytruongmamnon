@@ -1,0 +1,160 @@
+{% extends 'admin/base.html' %}
+{%block body%}
+<h1>Thống Kê Và Báo Cáo</h1>
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Hệ Thống Báo Cáo</h2>
+
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'class_size' %}active{% endif %}"
+               href="{{ url_for('statsview.index', tab='class_size') }}">
+                Thống kê Sĩ số
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'gender_chart' %}active{% endif %}"
+               href="{{ url_for('statsview.index', tab='gender_chart') }}">
+                Biểu đồ Tỉ lệ Nam/Nữ
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'revenue' %}active{% endif %}"
+               href="{{ url_for('statsview.index', tab='revenue') }}">
+                Thống kê Doanh thu
+            </a>
+        </li>
+    </ul>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            {% if active_tab == 'class_size' %}
+            <h4 class="mb-3">Thống kê sĩ số lớp học</h4>
+            <form class="form-inline mb-4">
+                <input type="hidden" name="tab" value="class_size">
+                <label class="mr-2">Chọn lớp:</label>
+                <select name="class_id" class="form-control mr-3" onchange="this.form.submit()">
+                    <option value="">-- Vui lòng chọn lớp --</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if c.id== class_id|int %}selected{% endif %}>{{ c.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            {% if class_size_data %}
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Tên Lớp</th>
+                    <th>Tổng số</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ class_size_data.name }}</td>
+                    <td class="font-weight-bold text-primary">{{ class_size_data.total }}</td>
+                </tr>
+                </tbody>
+            </table>
+            {% endif %}
+            {% endif %}
+
+
+            {% if active_tab == 'gender_chart' %}
+            <h4 class="mb-3">Biểu đồ tỉ lệ giới tính</h4>
+
+            <form class="form-inline mb-4">
+                <input type="hidden" name="tab" value="gender_chart">
+                <label class="mr-2">Chọn lớp</label>
+                <select name="class_id" class="form-control mr-3" onchange="this.form.submit()">
+                    <option value="">-- Vui lòng chọn lớp --</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}" {% if c.id == class_id|int %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+
+            {% if gender_chart_data %}
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const ctx = document.getElementById('genderChart').getContext('2d');
+                    const dataValues = [
+                        {{gender_chart_data.male}},
+                        {{gender_chart_data.female}}
+                    ];
+
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Nam', 'Nữ'],
+                            datasets: [{
+                                label: 'Số lượng',
+                                data: dataValues,
+                                backgroundColor: [
+                                    '#36a2eb',
+                                    '#ff6384'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Tỉ lệ Nam / Nữ'
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+            {% elif class_id %}
+            <p class="text-center text-muted">Không có dữ liệu</p>
+            {% endif %}
+            {% endif %}
+
+
+            {% if active_tab == 'revenue' %}
+            <h4 class="mb-3">Báo cáo doanh thu tháng</h4>
+
+            <form class="form-inline bg-light p-3 rounded mb-4">
+                <input type="hidden" name="tab" value="revenue">
+                <label class="mr-2">Tháng:</label>
+                <select name="month" class="form-control mr-3">
+                    {% for i in range(1, 13) %}
+                    <option value="{{ i }}" {% if i == month|int %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <label class="mr-2">Năm:</label>
+                <input type="number" name="year" value="{{ year }}" class="form-control mr-3"
+                       style="width: 100px">
+
+                <button type="submit" class="btn btn-primary">Xem</button>
+            </form>
+
+            <div class="alert alert-success text-center">
+                <h5>DOANH THU THÁNG {{ month }}/{{ year }}</h5>
+                <h1 class="display-4 font-weight-bold">
+                    {{ "{:,.0f}".format(revenue_data) }} VNĐ
+                </h1>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{%endblock%}

@@ -43,10 +43,13 @@ def login_page():
         password=request.form.get('password')
         user=utils.check_login(username=username,password=password)
 
-        if user :
+        if user.user_role==UserRole.USER :
             login_user(user=user)
             next = request.args.get('next', 'main')
             return redirect(url_for(next))
+        elif user.user_role==UserRole.ADMIN:
+            login_user(user=user)
+            return redirect('/admin')
         else:
             err_msg="Password of Username is Fasle"
     return render_template('login.html',err_msg=err_msg)
